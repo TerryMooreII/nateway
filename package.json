@@ -1,0 +1,68 @@
+{
+  "name": "nateway",
+  "description": "Nateway api gateway and service discovery",
+  "version": "0.0.0",
+  "author": "Terry Moore",
+  "main": "index.js",
+  "engines": {
+    "node": "v6.9.0"
+  },
+  "scripts": {
+    "test": "nyc mocha \"./{,!(node_modules)/**/}*.spec.js\" --require=./unit-test-setup.js --reporter=spec",
+    "test-watch": "npm t -- --watch",
+    "test-coverage": "http-server coverage",
+    "lint": "eslint --ext .js .",
+    "lint-fix": "eslint --ext .js --fix .",
+    "postversion": "git push --follow-tags"
+  },
+  "dependencies": {
+    "axios": "^0.17.1",
+    "good": "^8.1.0",
+    "good-console": "^7.0.1",
+    "good-squeeze": "^5.0.2",
+    "h2o2": "^8.0.0",
+    "hapi": "^17.2.0",
+    "pubsub-js": "^1.6.0",
+    "wreck": "^14.0.2"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "eslint": "^4.15.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "http-server": "^0.10.0",
+    "mocha": "^4.1.0",
+    "nyc": "^11.4.1",
+    "proxyquire": "^1.8.0",
+    "sinon": "^4.1.4"
+  },
+  "nyc": {
+    "check-coverage": true,
+    "per-file": false,
+    "lines": 80,
+    "statements": 80,
+    "functions": 80,
+    "branches": 50,
+    "include": [
+      "**/lib/*.js"
+    ],
+    "exclude": [
+      "**/*.spec.js"
+    ],
+    "reporter": [
+      "lcov",
+      "text-summary",
+      "html"
+    ],
+    "cache": true,
+    "all": true,
+    "report-dir": "./coverage"
+  },
+  "publishConfig": {
+    "registry": "https://nexus1.gcp.broadvine.com/repository/npm-bv/"
+  }
+}

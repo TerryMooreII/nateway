@@ -1,0 +1,22 @@
+variables:
+  GIT_SSL_NO_VERIFY: "true"
+
+stages:
+  - lint
+  - test
+
+lint:
+  image: node:latest
+  stage: lint
+  before_script:
+    - npm install
+  script:
+    - npm run lint
+
+test:
+  image: node:latest
+  stage: test
+  before_script:
+    - npm install
+  script:
+    - npm t
