@@ -15,6 +15,7 @@ module.exports = {
         "afterAll": true
     },
     "rules": {
+        "no-restricted-syntax": "off",
         "global-require": "off",
         "class-methods-use-this": "off",
         "import/no-dynamic-require": "off",

@@ -1,42 +1,17 @@
 const axios = require('axios');
 
-const config = {
-  nateway: 'http://localhost:8001',
-  service: {
-    name: 'Mapping',
-    health: 'http://localhost:3001/heartbeat',
-    endpoints: null
-  }
-};
+const register = (config = {}) => {
+  let promise;
 
-const swaggerParser = (data) => {
-  const [host, port] = data.host.split(':');
-  const protocol = data.schemes[0];
-
-  const api = {
-    protocol,
-    host,
-    port,
-    paths: []
-  };
-
-  for (const uri in data.paths) {
-    const path = uri.split('/')[1];
-    if (uri !== '/' && uri !== '/heartbeat' && api.paths.indexOf(path) === -1) {
-      api.paths.push(path);
-    }
+  if (config.plugin) {
+    promise = require(`${__dirname}/plugins/${config.plugin.name}`).run(config.plugin.config);
+  } else {
+    promise = new Promise([]);
   }
 
-  return api;
-};
-
-const getSwaggerConfig = () => axios.get('http://localhost:3001/swagger.json')
-  .then(response => swaggerParser(response.data));
-
-const register = () => {
-  getSwaggerConfig()
-    .then((swagger) => {
-      config.service.endpoints = swagger;
+  promise
+    .then((endpoints) => {
+      config.service.endpoints = endpoints;
     })
     .then(() => {
       axios.post(`${config.nateway}/add`, config.service)
@@ -46,4 +21,4 @@ const register = () => {
     });
 };
 
-module.export = register(config);
+module.exports = register;

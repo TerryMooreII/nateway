@@ -1,9 +1,7 @@
 const Hapi = require('hapi');
-const Wreck = require('wreck');
 const PubSub = require('pubsub-js');
 const remotes = require('./nateway-hosts');
 
-let serve
 
 const options = {
   reporters: {
@@ -20,40 +18,44 @@ const options = {
   }
 };
 
-const startServer = async (msg = 'Starting Nateway') => {
-  var startTime = process.hrtime();
+const parseHrtimeToSeconds = hrtime => (hrtime[0] + (hrtime[1] / 1000000)).toFixed(3); // ms
 
-  server = Hapi.server({ 
-    host: 'localhost', 
-    port: 8000 
+const startServer = async (msg = 'Starting Nateway') => {
+  const startTime = process.hrtime();
+
+  server = Hapi.server({
+    host: 'localhost',
+    port: 8000
   });
   try {
     await server.register({ plugin: require('h2o2') });
     await server.register({
       plugin: require('good'),
-      options,
-    }); 
+      options
+    });
     await server.start();
-    const ms = Math.floor(parseHrtimeToSeconds(process.hrtime(startTime)))
-    console.log(`${msg} (${ms} ms):  ${server.info.uri}`); 
-  }
-  catch(e) {
+    const ms = Math.floor(parseHrtimeToSeconds(process.hrtime(startTime)));
+    console.log(`${msg} (${ms} ms):  ${server.info.uri}`);
+  } catch (e) {
     console.log('Failed to load plugins');
   }
-}
+};
 
-const parseHrtimeToSeconds = (hrtime) => {
-  return (hrtime[0] + (hrtime[1] / 1000000)).toFixed(3); // ms
-}
+const configureRoutes = (services = new Map()) => {
+  for (const [, data] of services) {
+    const {
+      protocol,
+      host,
+      port,
+      uris
+    } = data.endpoints;
 
-configureRoutes = (remotes = new Map()) => {
-  for (const [name, data] of remotes) {
-    const {protocol, host, port, paths} = data.endpoints;
-    paths.forEach((path) => {
+    // eslint-disable-next-line
+    uris.forEach((uri) => {
       server.route([
         {
           method: '*',
-          path: '/' + path + '/{params*}',
+          path: `/${uri}/{params*}`,
           handler: {
             proxy: {
               host,
@@ -65,18 +67,17 @@ configureRoutes = (remotes = new Map()) => {
           }
         }
       ]);
-    })
-  };
-}
+    });
+  }
+};
 
-restartServer = () => {
-  server.stop({ timeout: 1000 }).then((err) => {
+const restartServer = () => {
+  server.stop({ timeout: 1000 }).then(() => {
     server = null;
     startServer('Routing table has been updated, restarting Nateway');
     configureRoutes(remotes);
-
-  })
-}
+  });
+};
 
 PubSub.subscribe('RESTART', restartServer);
 

@@ -1,5 +1,1 @@
-
-// Export your Code here
-
-// Example
-// module.exports = require('./lib/logger');
+module.exports = require('./src/client/nateway-client');

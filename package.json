@@ -5,9 +5,10 @@
   "author": "Terry Moore",
   "main": "index.js",
   "engines": {
-    "node": "v6.9.0"
+    "node": "v9.0.0"
   },
   "scripts": {
+    "dev": "nodemon server",
     "test": "nyc mocha \"./{,!(node_modules)/**/}*.spec.js\" --require=./unit-test-setup.js --reporter=spec",
     "test-watch": "npm t -- --watch",
     "test-coverage": "http-server coverage",

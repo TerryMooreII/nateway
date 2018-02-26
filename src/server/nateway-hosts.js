@@ -1,2 +1,2 @@
-
-module.exports = new Map();
+const hosts = new Map();
+module.exports = hosts;
