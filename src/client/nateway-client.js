@@ -4,9 +4,15 @@ const register = (config = {}) => {
   let promise;
 
   if (config.plugin) {
-    promise = require(`${__dirname}/plugins/${config.plugin.name}`).run(config.plugin.config);
+    if (config.plugin.name[0] === '.') {
+      // 3rd party
+      promise = require(`${config.plugin.name}`).run(config.plugin.config);
+    } else {
+      // included in nateway
+      promise = require(`${__dirname}/plugins/${config.plugin.name}`).run(config.plugin.config);
+    }
   } else {
-    promise = new Promise([]);
+    promise = new Promise(config.service.endpoints);
   }
 
   promise

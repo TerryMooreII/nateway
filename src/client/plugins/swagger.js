@@ -13,9 +13,14 @@ const parser = (data) => {
 
   // eslint-disable-next-line
   for (const uri in data.paths) {
-    const path = uri.split('/')[1];
-    if (uri !== '/' && uri !== '/heartbeat' && api.uris.indexOf(path) === -1) {
-      api.uris.push(path);
+    if (uri !== '/' && uri !== '/heartbeat') {
+      // eslint-disable-next-line
+      for (const method in data.paths[uri]) {
+        api.uris.push({
+          uri,
+          method: method.toUpperCase()
+        });
+      }
     }
   }
 
@@ -26,6 +31,8 @@ const request = config => axios.get(config.url)
   .then(response => parser(response.data));
 
 const run = config => request(config);
+
+// run({ url: 'http://localhost:3000/swagger.json' }).then(data => console.log(data));
 
 module.exports = {
   run

@@ -54,8 +54,8 @@ const configureRoutes = (services = new Map()) => {
     uris.forEach((uri) => {
       server.route([
         {
-          method: '*',
-          path: `/${uri}/{params*}`,
+          method: uri.method,
+          path: `${uri.uri}`,
           handler: {
             proxy: {
               host,
